@@ -96,7 +96,7 @@ cd server && npm run build
 ```
 PORT=5000
 NODE_ENV=development
-CLIENT_URL=http://localhost:3000
+CLIENT_URL=http://localhost:5000
 MONGO_URI=mongodb://localhost:27017/chat-app
 ```
 

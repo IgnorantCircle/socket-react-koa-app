@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
+import cors from '@koa/cors';
 import { Server } from 'socket.io';
 import http from 'http';
 import mongoose from 'mongoose';
@@ -8,6 +9,7 @@ import dotenv from 'dotenv';
 import { socketHandler } from './utils/socketHandler';
 
 // 导入路由
+import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import messageRoutes from './routes/messageRoutes';
 
@@ -43,10 +45,17 @@ const connectDB = async () => {
 };
 
 // 中间件
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 app.use(bodyParser());
 
 // 路由
 app.use(router.routes()).use(router.allowedMethods());
+app.use(authRoutes.routes()).use(authRoutes.allowedMethods());
 app.use(userRoutes.routes()).use(userRoutes.allowedMethods());
 app.use(messageRoutes.routes()).use(messageRoutes.allowedMethods());
 

@@ -1,24 +1,41 @@
-import React, { useState } from 'react';
-import Login from './components/Login';
+import React from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import AuthForm from './components/AuthForm';
 import Chat from './components/Chat';
 import './App.css';
 
-const App: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+// 主应用组件
+const AppContent: React.FC = () => {
+  const { state } = useAuth();
 
-  // 处理用户登录
-  const handleLogin = (loggedInUser: any) => {
-    setUser(loggedInUser);
-  };
+  // 显示加载状态
+  if (state.isLoading) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner"></div>
+        <p>加载中...</p>
+      </div>
+    );
+  }
 
+  // 根据认证状态显示不同组件
   return (
     <div className="app">
-      {user ? (
-        <Chat currentUser={user} />
+      {state.isAuthenticated && state.user ? (
+        <Chat currentUser={state.user} />
       ) : (
-        <Login onLogin={handleLogin} />
+        <AuthForm />
       )}
     </div>
+  );
+};
+
+// 根应用组件
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

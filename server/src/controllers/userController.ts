@@ -4,7 +4,7 @@ import User, { IUser } from '../models/User';
 // 获取所有用户
 export const getUsers = async (ctx: Context): Promise<void> => {
   try {
-    const users = await User.find().select('-__v');
+    const users = await User.find().select('-password -__v');
     ctx.status = 200;
     ctx.body = users;
   } catch (error) {
@@ -17,7 +17,7 @@ export const getUsers = async (ctx: Context): Promise<void> => {
 // 获取单个用户
 export const getUserById = async (ctx: Context): Promise<void> => {
   try {
-    const user = await User.findById(ctx.params.id).select('-__v');
+    const user = await User.findById(ctx.params.id).select('-password -__v');
     if (!user) {
       ctx.status = 404;
       ctx.body = { message: '用户不存在' };
@@ -32,10 +32,22 @@ export const getUserById = async (ctx: Context): Promise<void> => {
   }
 };
 
-// 创建用户
+// 创建用户（管理员功能）
 export const createUser = async (ctx: Context): Promise<void> => {
   try {
-    const { username, email, avatar } = ctx.request.body as IUser;
+    const { username, email, password, avatar } = ctx.request.body as {
+      username: string;
+      email: string;
+      password: string;
+      avatar?: string;
+    };
+    
+    // 验证必填字段
+    if (!username || !email || !password) {
+      ctx.status = 400;
+      ctx.body = { message: '用户名、邮箱和密码为必填项' };
+      return;
+    }
     
     // 检查用户名是否已存在
     const existingUsername = await User.findOne({ username });
@@ -57,12 +69,25 @@ export const createUser = async (ctx: Context): Promise<void> => {
     const newUser = new User({
       username,
       email,
+      password,
       avatar
     });
     
     const savedUser = await newUser.save();
+    
+    // 返回用户信息（不包含密码）
+    const userResponse = {
+      _id: savedUser._id,
+      username: savedUser.username,
+      email: savedUser.email,
+      avatar: savedUser.avatar,
+      isActive: savedUser.isActive,
+      createdAt: savedUser.createdAt,
+      updatedAt: savedUser.updatedAt
+    };
+    
     ctx.status = 201;
-    ctx.body = savedUser;
+    ctx.body = userResponse;
   } catch (error) {
     ctx.status = 500;
     ctx.body = { message: '服务器错误' };
