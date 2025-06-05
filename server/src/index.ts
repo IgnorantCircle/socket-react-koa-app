@@ -26,7 +26,7 @@ const server = http.createServer(app.callback());
 // 创建Socket.io服务器
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:5001',
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -46,7 +46,7 @@ const connectDB = async () => {
 
 // 中间件
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: process.env.CLIENT_URL || 'http://localhost:5001',
   credentials: true,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization', 'Accept']
@@ -68,7 +68,7 @@ router.get('/', async (ctx) => {
 io.on('connection', socketHandler);
 
 // 启动服务器
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, async () => {
   await connectDB();
   console.log(`服务器运行在端口 ${PORT}`);

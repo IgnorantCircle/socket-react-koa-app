@@ -30,7 +30,7 @@ class SocketService {
     this.username = username;
 
     // 连接到服务器
-    this.socket = io(process.env.REACT_APP_API_URL || 'http://localhost:5000');
+    this.socket = io(process.env.REACT_APP_API_URL || 'http://localhost:3000');
 
     // 连接成功后加入聊天
     this.socket.on('connect', () => {
